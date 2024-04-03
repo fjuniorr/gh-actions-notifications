@@ -1,0 +1,38 @@
+name: Open Issue on Warning and Clean Up Logs
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    - run: pip install -r requirements.txt
+
+    - run: pytest
+
+    - name: Process Log File
+      run: |
+        if ! grep 'WARNI' log.txt; then
+            rm log.txt
+        fi
+
+    - name: Open GitHub Issue
+      uses: peter-evans/create-issue-from-file@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        title: "Warning in data pipeline"
+        content-filepath: log.txt
+
+    - name: Workflow failure notification
+      uses: JasonEtco/create-an-issue@v2
+      if: failure()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        filename: .github/error.md
