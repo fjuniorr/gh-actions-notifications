@@ -5,7 +5,7 @@ import pytest
 logger = logging.getLogger(__name__)
 
 def test_valid():
-    logger.info("Warning here is no problema")
+    logger.warning("Warning here is no problema")
     assert True
 
 def test_invalid():
